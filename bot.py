@@ -1021,7 +1021,7 @@ async def release(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not kidnap_info:
         user_mention = create_user_mention(user.id, user.first_name)
         await update.message.reply_text(f"{user_mention}, в данный момент у Вас никто не похищен.", parse_mode='HTML')
-    
+        return
     delete_kidnap(kidnap_info['id'])
     
     # Используем универсальную функцию для кликабельных ников
@@ -1144,6 +1144,21 @@ async def name_child(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
         await update.message.reply_text("Пожалуйста, укажите номер ребенка: /name номер")
         return
+
+    try:
+        child_number = int(context.args[0])
+        children = get_children(user.id)
+        
+        if child_number < 1 or child_number > len(children):
+            await update.message.reply_text("Ребенок с таким номером не найден")
+            return
+        
+        child = children[child_number - 1]
+        save_temp_name(user.id, child['id'], "")
+        await update.message.reply_text("Введите имя которое хотели бы дать ребёнку:")
+        
+    except ValueError:
+        await update.message.reply_text("Пожалуйста, укажите корректный номер ребенка")
 
 async def handle_child_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -1359,9 +1374,9 @@ def main():
     
     # Создание приложения
     BOT_TOKEN = os.getenv('BOT_TOKEN')
-if not BOT_TOKEN:
-    raise ValueError("❌ BOT_TOKEN не найден! Проверь переменные окружения.")
-application = Application.builder().token(BOT_TOKEN).build()
+    if not BOT_TOKEN:
+        raise ValueError("❌ BOT_TOKEN не найден! Проверь переменные окружения.")
+    application = Application.builder().token(BOT_TOKEN).build()
     
     # Обработчики команд брака
     application.add_handler(CommandHandler("propose", propose))
