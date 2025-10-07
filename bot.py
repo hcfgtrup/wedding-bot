@@ -7,8 +7,25 @@ import random
 import time
 from typing import Dict, List, Tuple, Optional
 from telegram import MessageEntity
-import os
 from dotenv import load_dotenv
+import os
+import threading
+from flask import Flask
+
+# Создаем Flask приложение для поддержания работы
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "🤵👰 Wedding Bot is running!"
+
+def run_flask():
+    app.run(host='0.0.0.0', port=8000)
+
+def keep_alive():
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -1369,13 +1386,17 @@ async def random_number(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Пожалуйста, укажите целые числа!")
 
 def main():
+    # Запускаем Flask для поддержания работы
+    keep_alive()
+    print("🚀 Bot starting with 24/7 support...")
     # Инициализация базы данных
     init_db()
     
     # Создание приложения
     BOT_TOKEN = os.getenv('BOT_TOKEN')
     if not BOT_TOKEN:
-        raise ValueError("❌ BOT_TOKEN не найден! Проверь переменные окружения.")
+        raise ValueError("❌ BOT_TOKEN not found!")
+    
     application = Application.builder().token(BOT_TOKEN).build()
     
     # Обработчики команд брака
