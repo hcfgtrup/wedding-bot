@@ -7,8 +7,6 @@ import random
 import time
 from typing import Dict, List, Tuple, Optional
 from telegram import MessageEntity
-from dotenv import load_dotenv
-import os
 import threading
 from flask import Flask
 
@@ -26,9 +24,6 @@ def keep_alive():
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.daemon = True
     flask_thread.start()
-
-# Загружаем переменные окружения
-load_dotenv()
 
 def create_user_mention(user_id: int, user_name: str) -> str:
     """Создает кликабельное упоминание пользователя"""
@@ -1393,7 +1388,7 @@ def main():
     init_db()
     
     # Создание приложения
-    BOT_TOKEN = os.getenv('BOT_TOKEN')
+    BOT_TOKEN = "8241053303:AAH8asphJN8vSXjNdiVSmEPXgnIfEwp2Dp0"
     if not BOT_TOKEN:
         raise ValueError("❌ BOT_TOKEN not found!")
     
